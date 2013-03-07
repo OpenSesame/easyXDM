@@ -69,6 +69,7 @@ easyXDM.stack.FlashTransport = function(config){
         
         // prepare the init function that will fire once the swf is ready
         easyXDM.Fn.set("flash_loaded" + domain.replace(/[\-.]/g, "_"), function(){
+			log4javascript.getLogger().trace("swf successfully embedded, calling callbacks");
             easyXDM.stack.FlashTransport[domain].swf = swf = swfContainer.firstChild;
             var queue = easyXDM.stack.FlashTransport[domain].queue;
             for (var i = 0; i < queue.length; i++) {
@@ -104,6 +105,7 @@ easyXDM.stack.FlashTransport = function(config){
             document.body.appendChild(swfContainer);
         }
         
+		log4javascript.getLogger().trace("embedding the swf");
         // create the object/embed
         var flashVars = "callback=flash_loaded" + domain.replace(/[\-.]/g, "_") + "&proto=" + global.location.protocol + "&domain=" + getDomainName(global.location.href) + "&port=" + getPort(global.location.href) + "&ns=" + namespace;
         // #ifdef debug
@@ -171,6 +173,7 @@ easyXDM.stack.FlashTransport = function(config){
             config.swf = resolveUrl(config.swf); // reports have been made of requests gone rogue when using relative paths
             var swfdomain = getDomainName(config.swf);
             var fn = function(){
+				log4javascript.getLogger().trace("setup for flashProtocol");
                 // set init to true in case the fn was called was invoked from a separate instance
                 easyXDM.stack.FlashTransport[swfdomain].init = true;
                 swf = easyXDM.stack.FlashTransport[swfdomain].swf;
@@ -178,6 +181,7 @@ easyXDM.stack.FlashTransport = function(config){
                 swf.createChannel(config.channel, config.secret, getLocation(config.remote), config.isHost);
                 
                 if (config.isHost) {
+					log4javascript.getLogger().trace("flashProtocol setting up host.");
                     // if Flash is going to be throttled and we want to avoid this
                     if (HAS_FLASH_THROTTLED_BUG && config.swfNoThrottle) {
                         apply(config.props, {
@@ -203,12 +207,14 @@ easyXDM.stack.FlashTransport = function(config){
             };
             
             if (easyXDM.stack.FlashTransport[swfdomain] && easyXDM.stack.FlashTransport[swfdomain].init) {
+				log4javascript.getLogger().trace("swf already added runing setup");
                 // if the swf is in place and we are the consumer
                 fn();
             }
             else {
                 // if the swf does not yet exist
                 if (!easyXDM.stack.FlashTransport[swfdomain]) {
+					log4javascript.getLogger().trace("registering setup to run when swf is ready and then adding the swf.");
                     // add the queue to hold the init fn's
                     easyXDM.stack.FlashTransport[swfdomain] = {
                         queue: [fn]
@@ -216,11 +222,13 @@ easyXDM.stack.FlashTransport = function(config){
                     addSwf(swfdomain);
                 }
                 else {
+					log4javascript.getLogger().trace("registering setup to run when swf is ready even though it is already added");
                     easyXDM.stack.FlashTransport[swfdomain].queue.push(fn);
                 }
             }
         },
         init: function(){
+			log4javascript.getLogger().trace("flashProtocol.init");
             whenReady(pub.onDOMReady, pub);
         }
     });

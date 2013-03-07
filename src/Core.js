@@ -505,11 +505,13 @@ function createFrame(config){
     // Internally this is set as 'submitName' instead when using 'iframe.name = ...'
     // This is not required by easyXDM itself, but is to facilitate other use cases 
     if (HAS_NAME_PROPERTY_BUG) {
+		log4javascript.getLogger().trace("create frame, has name property bug");
         frame = document.createElement("<iframe name=\"" + config.props.name + "\"/>");
 		
 		//this is to prevent the mixed mode popup in IE6/7 when serving in a https context.
 		if(config.initialFrameSource)
 		{
+			log4javascript.getLogger().trace("create frame, setting initialFrameSource", config.initialFrameSource);
 			frame.src = config.initialFrameSource;
 		}
     }
@@ -549,6 +551,7 @@ function createFrame(config){
     
     frame.border = frame.frameBorder = 0;
     frame.allowTransparency = true;
+	log4javascript.getLogger().trace("about to add frame with following properties", config.props);
     config.container.appendChild(frame);
     
     if (config.onLoad) {
@@ -698,6 +701,7 @@ function prepareTransportStack(config){
         // #endif
     }
     config.protocol = protocol; // for conditional branching
+	log4javascript.getLogger().trace("socket going to use protocol", protocol);
     switch (protocol) {
         case "0":// 0 = HashTransport
             apply(config, {
@@ -791,6 +795,7 @@ function prepareTransportStack(config){
         case "6":
             if (!flashVersion) {
                 hasFlash();
+				log4javascript.getLogger().trace("browser has flash", flashVersion);
             }
             stackEls = [new easyXDM.stack.FlashTransport(config)];
             break;

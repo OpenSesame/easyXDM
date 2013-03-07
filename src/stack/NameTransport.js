@@ -143,6 +143,7 @@ easyXDM.stack.NameTransport = function(config){
             
             // Set up the iframe that will be used for the transport
             var onLoad = function(){
+			log4javascript.getLogger().trace("Name frame created");
                 // Remove the handler
                 var w = callerWindow || this;
                 un(w, "load", onLoad);
@@ -157,6 +158,7 @@ easyXDM.stack.NameTransport = function(config){
                 }());
             };
             
+			log4javascript.getLogger().trace("about to create name frame");
             callerWindow = createFrame({
                 props: {
                     src: config.local + "#_4" + config.channel
